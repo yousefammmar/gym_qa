@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--
+  profile.html: your account. Change display name and email, change password.
+  Script: js/profile.js (GET/PUT /api/profile, PUT /api/profile/password).
+  Rules: AUTH-02 email, AUTH-03 password, AUTH-04 unique email, AUTH-09 display name, AUTH-10 current password.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow">account</p>
+        <h1>Profile</h1>
+        <p class="muted">Signed in as <strong id="username"></strong> · member since <span id="memberSince"></span></p>
+      </div>
+    </div>
+
+    <section class="section grid grid-2">
+      <form class="card form" id="profileForm" novalidate>
+        <h2>Details</h2>
+        <label class="field"><span>Display name</span>
+          <input name="displayName" maxlength="50" />
+          <small>Leave empty to use your username</small>
+        </label>
+        <label class="field"><span>Email</span>
+          <input name="email" type="email" maxlength="100" required />
+        </label>
+        <p class="form-error" role="alert"></p>
+        <!-- Save details: PUT /api/profile -->
+        <button class="btn primary" type="submit">Save details</button>
+      </form>
+
+      <form class="card form" id="passwordForm" novalidate>
+        <h2>Change password</h2>
+        <label class="field"><span>Current password</span>
+          <input name="currentPassword" type="password" autocomplete="current-password" required />
+        </label>
+        <label class="field"><span>New password</span>
+          <input name="newPassword" type="password" autocomplete="new-password" minlength="8" maxlength="64" required />
+          <small>8–64 characters with at least one letter and one digit</small>
+        </label>
+        <p class="form-error" role="alert"></p>
+        <!-- Change password: PUT /api/profile/password (your other devices are logged out) -->
+        <button class="btn dark" type="submit">Change password</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

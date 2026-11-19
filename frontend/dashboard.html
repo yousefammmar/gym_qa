@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--
+  dashboard.html: first page after login.
+  Shows today's plan day, an unfinished workout, the weekly tracker (completed workouts this week
+  out of the 5 plan days), headline numbers, the week, recent workouts, goals and a chart.
+  Script: js/dashboard.js (data from GET /api/dashboard and GET /api/plan).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow" id="todayDate"></p>
+        <h1>Hi, <span id="displayName"></span></h1>
+        <p class="muted" id="todayText"></p>
+      </div>
+      <div class="btn-row">
+        <!-- Resume button: opens the workout that is still in progress -->
+        <a class="btn primary" id="resumeLink" hidden>Resume workout</a>
+        <!-- Start button: creates today's plan workout (POST /api/workouts) and opens it -->
+        <button class="btn primary" id="startTodayButton" hidden>Start today's workout</button>
+        <a class="btn ghost" href="index.html">Choose a day</a>
+      </div>
+    </div>
+
+    <section class="section stack">
+      <div class="tracker-section">
+        <div>
+          <p class="eyebrow">weekly progress</p>
+          <h2>Tracker</h2>
+          <p class="muted">Completed workouts this week (Monday to Sunday) against the 5 training days of the plan. It starts again every Monday.</p>
+        </div>
+        <div class="tracker-card">
+          <div class="tracker-top">
+            <strong id="weekPercent">0%</strong>
+            <span id="weekCount"></span>
+          </div>
+          <div class="progress-track"><span id="weekBar"></span></div>
+        </div>
+      </div>
+
+      <div class="stat-tiles">
+        <div class="stat-tile"><strong id="totalCompleted">0</strong><small>Completed workouts</small></div>
+        <div class="stat-tile"><strong id="totalVolume">0</strong><small>Total volume (kg)</small></div>
+        <div class="stat-tile"><strong id="currentStreak">0</strong><small>Day streak</small></div>
+        <div class="stat-tile"><strong id="longestStreak">0</strong><small>Longest streak</small></div>
+      </div>
+
+      <div class="week-grid" id="weekGrid"></div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-head"><h2>Recent workouts</h2><a class="btn small" href="workouts.html">All workouts</a></div>
+          <ul class="list" id="recentList"></ul>
+          <p class="empty" id="recentEmpty" hidden>No workouts yet. Start today's session above.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Goals</h2><a class="btn small" href="goals.html">Manage goals</a></div>
+          <div class="stack" id="goalList"></div>
+          <p class="empty" id="goalEmpty" hidden>No active goals. Set one to stay motivated.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Workouts per week</h2><a class="btn small" href="progress.html">Full progress</a></div>
+        <div id="weeklyChart"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <!-- ===== Templates ===== -->
+  <template id="weekCardTemplate">
+    <article class="week-card">
+      <span class="week-badge" data-field="tag"></span>
+      <div><strong data-field="day"></strong><span data-field="title"></span></div>
+    </article>
+  </template>
+
+  <template id="recentWorkoutTemplate">
+    <li>
+      <a class="list-item">
+        <div>
+          <strong data-field="name"></strong>
+          <div class="meta" data-field="details"></div>
+        </div>
+        <span class="pill" data-field="status"></span>
+      </a>
+    </li>
+  </template>
+
+  <template id="goalTemplate">
+    <div class="goal-card">
+      <div class="card-head"><strong data-field="title"></strong><span class="pill" data-field="state"></span></div>
+      <div class="progress-track"><span></span></div>
+      <div class="goal-numbers"><span data-field="percent"></span><span data-field="due"></span></div>
+    </div>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

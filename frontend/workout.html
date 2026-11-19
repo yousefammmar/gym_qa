@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--
+  workout.html?id=12: one workout session.
+  Start it, log sets (weight x reps), edit or tick sets, add/remove exercises, complete it, edit or delete it.
+  Script: js/workout.js (all calls go to /api/workouts/{id}/...).
+  Rules shown: WKT-01 reps 1-100, WKT-02 weight 0-500 kg, WKT-03 sets 1-20, WKT-04 duration 1-300 min,
+  WKT-05 a completed set is needed to finish, WKT-12 a completed workout keeps one completed set.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workout · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow"><a href="workouts.html">← workouts</a></p>
+        <h1 id="workoutName">Workout</h1>
+        <div class="session-meta">
+          <span class="pill" id="statusPill"></span>
+          <span id="workoutDate"></span>
+          <span id="setCount"></span>
+          <span id="volume"></span>
+          <span id="duration"></span>
+        </div>
+        <p class="muted" id="workoutNotes"></p>
+      </div>
+      <div class="btn-row">
+        <!-- Start: POST /api/workouts/{id}/start, status becomes "In progress" (only for planned workouts) -->
+        <button class="btn dark" id="startButton" hidden>Start</button>
+        <!-- Complete: opens the duration dialog below -->
+        <button class="btn primary" id="completeButton" hidden>Complete workout</button>
+        <!-- Edit: opens the edit dialog below -->
+        <button class="btn" id="editButton">Edit</button>
+        <!-- Delete: asks "are you sure?", then DELETE /api/workouts/{id} -->
+        <button class="btn danger" id="deleteButton">Delete</button>
+      </div>
+    </div>
+
+    <section class="section stack">
+      <div class="stack" id="exerciseList"></div>
+      <p class="empty" id="noExercises" hidden>No exercises yet. Add one below.</p>
+
+      <form class="card form" id="addExerciseForm" novalidate>
+        <h2>Add exercise</h2>
+        <div class="form-row">
+          <label class="field"><span>Exercise</span>
+            <select name="exerciseId" id="exerciseSelect" required></select>
+          </label>
+          <label class="field"><span>Target sets (1–20)</span>
+            <input name="targetSets" type="number" min="1" max="20" step="1" value="3" required />
+          </label>
+          <label class="field"><span>Target reps</span>
+            <input name="targetReps" maxlength="20" value="6–10" />
+          </label>
+          <!-- Add: POST /api/workouts/{id}/exercises -->
+          <button class="btn primary" type="submit">Add</button>
+        </div>
+        <p class="form-error" role="alert"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <!-- ===== Dialog: complete the workout ===== -->
+  <dialog class="dialog" id="completeDialog">
+    <form class="form" id="completeForm" novalidate>
+      <h2>Complete workout</h2>
+      <label class="field"><span>Duration in minutes (1–300)</span>
+        <input name="durationMinutes" type="number" min="1" max="300" step="1" />
+        <small id="completeHint"></small>
+      </label>
+      <p class="form-error" role="alert"></p>
+      <div class="btn-row">
+        <button class="btn" type="button" data-close>Cancel</button>
+        <!-- Complete: POST /api/workouts/{id}/complete {durationMinutes} -->
+        <button class="btn primary" type="submit">Complete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== Dialog: edit name, date, notes, duration ===== -->
+  <dialog class="dialog" id="editDialog">
+    <form class="form" id="editForm" novalidate>
+      <h2>Edit workout</h2>
+      <label class="field"><span>Name</span><input name="name" maxlength="60" /></label>
+      <label class="field"><span>Date</span><input name="workoutDate" type="date" required /></label>
+      <label class="field"><span>Notes</span><textarea name="notes" maxlength="500"></textarea></label>
+      <label class="field" id="editDurationField"><span>Duration in minutes (1–300)</span>
+        <input name="durationMinutes" type="number" min="1" max="300" step="1" />
+      </label>
+      <p class="form-error" role="alert"></p>
+      <div class="btn-row">
+        <button class="btn" type="button" data-close>Cancel</button>
+        <!-- Save: PUT /api/workouts/{id} -->
+        <button class="btn primary" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== Templates ===== -->
+  <template id="exerciseBlockTemplate">
+    <article class="exercise-block">
+      <header>
+        <div>
+          <h3 data-field="name"></h3>
+          <span class="muted" data-field="target"></span>
+        </div>
+        <!-- Remove exercise: asks first, then DELETE /api/workouts/{id}/exercises/{blockId} -->
+        <button class="icon-btn" data-action="remove">✕</button>
+      </header>
+      <ol class="set-list"></ol>
+      <form class="log-form" novalidate>
+        <label class="field"><span>Weight (kg)</span>
+          <input name="weightKg" type="number" min="0" max="500" step="0.25" required />
+        </label>
+        <label class="field"><span>Reps</span>
+          <input name="reps" type="number" min="1" max="100" step="1" required />
+        </label>
+        <!-- Log set: POST /api/workouts/{id}/sets -->
+        <button class="btn primary" type="submit" data-field="logLabel">Log set</button>
+        <p class="form-error" role="alert" style="grid-column: 1 / -1"></p>
+      </form>
+    </article>
+  </template>
+
+  <template id="setRowTemplate">
+    <li class="set-row">
+      <span class="set-no" data-field="number"></span>
+      <input class="inline-input" name="weightKg" type="number" min="0" max="500" step="0.25" aria-label="Weight in kg" />
+      <input class="inline-input" name="reps" type="number" min="1" max="100" step="1" aria-label="Reps" />
+      <!-- done tick: only ticked sets count toward volume and completion -->
+      <label><input type="checkbox" name="completed" /> done</label>
+      <!-- Delete set: DELETE /api/workouts/{id}/sets/{setId} -->
+      <button class="icon-btn" data-action="delete-set" aria-label="Delete set">✕</button>
+    </li>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/workout.js"></script>
+</body>
+</html>

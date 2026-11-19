@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  goals.html: fitness goals. Create, track, edit, mark completed, delete.
+  Script: js/goals.js (/api/goals). Progress is calculated by the server from your workouts.
+  Rules: GOL-01 title, GOL-02 target > 0, GOL-03 date not in the past, GOL-04 type/exercise,
+  GOL-05 type limits, GOL-08 complete only at 100 %, GOL-09 completed goals are read-only.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goals · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow">targets</p>
+        <h1>Goals</h1>
+        <p class="muted">Progress counts completed workouts from the day a goal is created.</p>
+      </div>
+    </div>
+
+    <section class="section stack">
+      <form class="card form" id="goalForm" novalidate>
+        <h2>New goal</h2>
+        <div class="form-row">
+          <label class="field"><span>Title</span>
+            <input name="title" maxlength="80" placeholder="e.g. 20 sessions before spring" required />
+          </label>
+          <label class="field"><span>Type</span>
+            <select name="type">
+              <option value="WORKOUT_COUNT">Complete a number of workouts</option>
+              <option value="TOTAL_VOLUME">Lift a total volume (kg × reps)</option>
+              <option value="EXERCISE_MAX_WEIGHT">Reach a weight on one exercise</option>
+            </select>
+          </label>
+          <!-- only shown for "Reach a weight on one exercise" -->
+          <label class="field" id="exerciseField" hidden><span>Exercise</span>
+            <select name="exerciseId" id="goalExercise"></select>
+          </label>
+          <label class="field"><span>Target</span>
+            <input name="targetValue" type="number" min="0" step="any" required />
+          </label>
+          <label class="field"><span>Target date</span>
+            <input name="targetDate" type="date" id="targetDate" required />
+          </label>
+          <!-- Create goal: POST /api/goals -->
+          <button class="btn primary" type="submit">Create goal</button>
+        </div>
+        <p class="form-error" role="alert"></p>
+      </form>
+
+      <div class="grid grid-2" id="goalList"></div>
+      <p class="empty" id="noGoals" hidden>No goals yet.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <!-- ===== Dialog: edit a goal ===== -->
+  <dialog class="dialog" id="editGoalDialog">
+    <form class="form" id="editGoalForm" novalidate>
+      <h2>Edit goal</h2>
+      <label class="field"><span>Title</span><input name="title" maxlength="80" /></label>
+      <label class="field"><span>Target</span><input name="targetValue" type="number" step="any" /></label>
+      <label class="field"><span>Target date</span><input name="targetDate" type="date" /></label>
+      <p class="form-error" role="alert"></p>
+      <div class="btn-row">
+        <button class="btn" type="button" id="cancelEdit">Cancel</button>
+        <!-- Save: PUT /api/goals/{id} -->
+        <button class="btn primary" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="goalCardTemplate">
+    <article class="card goal-card">
+      <div class="card-head"><h3 data-field="title"></h3><span class="pill" data-field="state"></span></div>
+      <p class="muted" data-field="description"></p>
+      <div class="progress-track"><span></span></div>
+      <div class="goal-numbers"><span data-field="numbers"></span><span data-field="date"></span></div>
+      <div class="btn-row goal-actions">
+        <!-- Mark completed: only possible at 100 % (POST /api/goals/{id}/complete) -->
+        <button class="btn primary small" data-action="complete">Mark completed</button>
+        <!-- Edit: opens the edit dialog -->
+        <button class="btn small" data-action="edit">Edit</button>
+        <!-- Delete: asks first, then DELETE /api/goals/{id} -->
+        <button class="btn small danger" data-action="delete">Delete</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/goals.js"></script>
+</body>
+</html>

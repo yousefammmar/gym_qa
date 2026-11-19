@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+  register.html: create an account (POST /api/auth/register).
+  Script: js/register.js. The hints below match rules AUTH-01..03; the Java backend checks them again.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign up · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="login.html">Log in</a>
+      <a href="register.html" class="nav-cta">Sign up</a>
+    </nav>
+  </header>
+
+  <main class="auth-wrap">
+    <p class="eyebrow">start tracking</p>
+    <h1>Create account</h1>
+    <form class="card form" id="registerForm" novalidate>
+      <label class="field"><span>Username</span>
+        <input name="username" autocomplete="username" minlength="3" maxlength="30" required />
+        <small>3–30 characters: letters, digits or _</small>
+      </label>
+      <label class="field"><span>Display name (optional)</span>
+        <input name="displayName" autocomplete="nickname" maxlength="50" />
+      </label>
+      <label class="field"><span>Email</span>
+        <input name="email" type="email" autocomplete="email" maxlength="100" required />
+      </label>
+      <label class="field"><span>Password</span>
+        <input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="64" required />
+        <small>8–64 characters with at least one letter and one digit</small>
+      </label>
+      <p class="form-error" role="alert"></p>
+      <!-- Create account button: POST /api/auth/register. A broken rule shows its message and code (AUTH-01..04) -->
+      <button class="btn primary" type="submit">Create account</button>
+      <p class="muted">Already registered? <a href="login.html"><strong>Log in</strong></a></p>
+    </form>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>

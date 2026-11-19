@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--
+  index.html: home page and workout plan (the original website, now fed by the database).
+  Visitors see the plan and can sign up. Logged-in users also get a "Start ..." button on every day.
+  Script: js/home.js (fills the summary numbers, the week grid and the day cards from GET /api/plan).
+  The plan itself is stored in backend/src/main/resources/db/schema.sql.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Tracker · PPL + Upper/Lower</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <!-- Menu button (phones/tablets): opens the links below (common.js) -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <!-- visitors -->
+      <a href="#structure" data-show="guest">Structure</a>
+      <a href="#workouts" data-show="guest">Plan</a>
+      <a href="#notes" data-show="guest">Notes</a>
+      <a href="login.html" data-show="guest">Log in</a>
+      <a href="register.html" class="nav-cta" data-show="guest">Sign up</a>
+      <!-- logged-in users: same links as every other app page -->
+      <a href="dashboard.html" data-show="member">Dashboard</a>
+      <a href="index.html" data-show="member">Plan</a>
+      <a href="workouts.html" data-show="member">Workouts</a>
+      <a href="exercises.html" data-show="member">Exercises</a>
+      <a href="progress.html" data-show="member">Progress</a>
+      <a href="goals.html" data-show="member">Goals</a>
+      <a href="profile.html" data-show="member">Profile</a>
+      <a href="#" id="logoutLink" data-show="member">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">final rebuilt structure</p>
+        <h1>Push / Pull / Legs + Upper / Lower</h1>
+        <p>
+          Your 5-day plan with core work included as finishers, not as a separate day.
+          Log every set, rep and kilo, and watch your progress build week by week.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="register.html" data-show="guest">Start Tracking</a>
+          <a class="btn ghost" href="login.html" data-show="guest">Log in</a>
+          <a class="btn primary" href="dashboard.html" data-show="member">Go to dashboard</a>
+          <!-- Open Sheet (kept from the original site): the Google Sheet in a new tab, needs internet -->
+          <a class="btn ghost" href="https://docs.google.com/spreadsheets/d/1RQcwdyvkes_KvgGQYvOj1Pf5LTyPjJB7SNe7TEFIVUU/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Open Sheet</a>
+        </div>
+      </div>
+      <aside class="summary-panel" aria-label="Plan summary">
+        <div><span id="totalExercises">–</span><small>Total exercises</small></div>
+        <div><span id="trainingDays">–</span><small>Training days</small></div>
+        <div><span id="recoveryDays">–</span><small>Recovery days</small></div>
+      </aside>
+    </section>
+
+    <section class="section" id="structure">
+      <div class="section-head">
+        <p class="eyebrow">weekly flow</p>
+        <h2>Program Structure</h2>
+        <p class="muted">Five lifting days, two recovery days, and core movements placed inside Leg/Lower/Upper as finishers.</p>
+      </div>
+      <div class="week-grid" id="weekGrid"></div>
+    </section>
+
+    <section class="section" id="workouts">
+      <div class="section-head">
+        <p class="eyebrow">day-by-day</p>
+        <h2>Workout Plan</h2>
+        <p class="muted" data-show="member">Press Start on a day to open a session with its exercises already filled in.</p>
+      </div>
+      <!-- Filter buttons (one per day + All) are added by home.js -->
+      <div class="filters" id="filters" role="group" aria-label="Filter plan days"></div>
+      <div class="workout-layout" id="dayList"></div>
+    </section>
+
+    <section class="section" id="notes">
+      <div class="section-head">
+        <p class="eyebrow">training notes</p>
+        <h2>Run the plan properly</h2>
+      </div>
+      <div class="notes-grid">
+        <article>
+          <h3>Progression</h3>
+          <p>Add weight only when you hit the top of the rep range with clean form on all sets.</p>
+        </article>
+        <article>
+          <h3>Core finishers</h3>
+          <p>For planks, hanging raises, twists, and back extensions, stop when your form breaks.</p>
+        </article>
+        <article>
+          <h3>Recovery</h3>
+          <p>Keep the two rest days. Use them for walking, stretching, and getting enough sleep.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · based on the PPL + Upper/Lower sheet · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <!-- ===== Templates: home.js copies these and fills the [data-field] parts ===== -->
+  <template id="weekCardTemplate">
+    <article class="week-card">
+      <span class="week-badge" data-field="tag"></span>
+      <div><strong data-field="day"></strong><span data-field="title"></span></div>
+    </article>
+  </template>
+
+  <template id="dayCardTemplate">
+    <article class="day-card">
+      <header class="day-header">
+        <span class="day-number" data-field="number"></span>
+        <div>
+          <h3 data-field="name"></h3>
+          <p class="muted" data-field="focus"></p>
+        </div>
+        <span class="day-pill" data-field="prescription"></span>
+      </header>
+      <ul class="exercise-grid"></ul>
+      <div class="day-actions" data-show="member">
+        <!-- Start button: creates a session from this day (POST /api/workouts) and opens workout.html -->
+        <button class="btn primary" data-field="startLabel"></button>
+      </div>
+    </article>
+  </template>
+
+  <template id="planExerciseTemplate">
+    <li class="exercise-item plain">
+      <div>
+        <div class="exercise-title">
+          <span data-field="name"></span>
+          <span class="set-badge" data-field="sets"></span>
+        </div>
+        <div class="exercise-meta" data-field="meta"></div>
+      </div>
+    </li>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

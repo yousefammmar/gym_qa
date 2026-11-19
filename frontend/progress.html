@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  progress.html: progress tracking.
+  Totals and streaks, this week, weekly charts, one exercise's progression and the workout history.
+  Script: js/progress.js (GET /api/progress, /api/progress/exercises/{id}, /api/workouts?status=COMPLETED).
+  Only completed workouts and ticked sets count (rules PRG-01..07). Charts: js/charts.js.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progress · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow">numbers</p>
+        <h1>Progress</h1>
+        <p class="muted">Only completed workouts and ticked sets are counted.</p>
+      </div>
+    </div>
+
+    <section class="section stack">
+      <div class="stat-tiles">
+        <div class="stat-tile"><strong id="totalCompleted">0</strong><small>Completed workouts</small></div>
+        <div class="stat-tile"><strong id="totalVolume">0</strong><small>Training volume (kg × reps)</small></div>
+        <div class="stat-tile"><strong id="currentStreak">0</strong><small>Current day streak</small></div>
+        <div class="stat-tile"><strong id="longestStreak">0</strong><small>Longest day streak</small></div>
+      </div>
+
+      <div class="tracker-section">
+        <div>
+          <p class="eyebrow" id="weekStart">this week</p>
+          <h2 id="weekTitle"></h2>
+        </div>
+        <div class="tracker-card">
+          <div class="tracker-top"><strong id="weekPercent">0%</strong><span>of the weekly plan</span></div>
+          <div class="progress-track"><span id="weekBar"></span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card"><h2>Workouts per week</h2><div id="workoutsChart"></div></div>
+        <div class="card"><h2>Volume per week (kg)</h2><div id="volumeChart"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Exercise progression</h2>
+          <label class="field"><span>Exercise</span>
+            <!-- Exercise picker: loads that exercise's numbers and redraws the chart -->
+            <select id="exercisePicker"></select>
+          </label>
+        </div>
+        <div id="exerciseChart"></div>
+        <div class="table-wrap" id="exerciseTable">
+          <table class="table">
+            <thead><tr><th>Date</th><th>Heaviest set</th><th>Sets</th><th>Volume</th></tr></thead>
+            <tbody id="exerciseRows"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="noExerciseData" hidden>No completed sets for this exercise yet.</p>
+      </div>
+
+      <div class="card">
+        <h2>History</h2>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Date</th><th>Workout</th><th>Sets</th><th>Volume</th><th>Minutes</th></tr></thead>
+            <tbody id="historyRows"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="noHistory" hidden>No completed workouts yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <template id="exerciseRowTemplate">
+    <tr><td data-field="date"></td><td data-field="heaviest"></td><td data-field="sets"></td><td data-field="volume"></td></tr>
+  </template>
+
+  <template id="historyRowTemplate">
+    <tr>
+      <td data-field="date"></td>
+      <td><a><strong data-field="name"></strong></a></td>
+      <td data-field="sets"></td><td data-field="volume"></td><td data-field="minutes"></td>
+    </tr>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/progress.js"></script>
+</body>
+</html>

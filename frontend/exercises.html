@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--
+  exercises.html: exercise library. Search, filter by muscle group, create custom exercises.
+  Script: js/exercises.js (GET /api/exercises?search=&muscleGroup=, POST /api/exercises).
+  Rules: EXR-02 search, EXR-03 filter, EXR-04..07 custom exercise.
+  The muscle-group lists below match MuscleGroup.java in the backend.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercises · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow">library</p>
+        <h1>Exercises</h1>
+        <p class="muted">The 27 exercises of the plan plus any custom ones you add.</p>
+      </div>
+    </div>
+
+    <section class="section stack">
+      <!-- Search form: typing or choosing a muscle group updates the results (GET /api/exercises) -->
+      <form class="card form" id="filterForm" role="search">
+        <div class="form-row">
+          <label class="field"><span>Search</span>
+            <input name="search" type="search" placeholder="e.g. curl, row, press" />
+          </label>
+          <label class="field"><span>Muscle group</span>
+            <select name="muscleGroup">
+              <option value="">All muscle groups</option>
+              <option value="CHEST">Chest</option>
+              <option value="BACK">Back</option>
+              <option value="SHOULDERS">Shoulders</option>
+              <option value="BICEPS">Biceps</option>
+              <option value="TRICEPS">Triceps</option>
+              <option value="QUADS">Quads</option>
+              <option value="HAMSTRINGS">Hamstrings</option>
+              <option value="GLUTES">Glutes</option>
+              <option value="CALVES">Calves</option>
+              <option value="CORE">Core</option>
+              <option value="FULL_BODY">Full body</option>
+            </select>
+          </label>
+          <button class="btn dark" type="submit">Search</button>
+        </div>
+      </form>
+
+      <div class="card">
+        <div class="card-head"><h2>Results</h2><span class="muted" id="resultCount"></span></div>
+        <div class="grid grid-3" id="results"></div>
+        <p class="empty" id="noResults" hidden>No exercises match. Try another word or muscle group.</p>
+      </div>
+
+      <form class="card form" id="customForm" novalidate>
+        <h2>Create custom exercise</h2>
+        <div class="form-row">
+          <label class="field"><span>Name (2–50)</span><input name="name" maxlength="50" required /></label>
+          <label class="field"><span>Muscle group</span>
+            <select name="muscleGroup" required>
+              <option value="">Choose…</option>
+              <option value="CHEST">Chest</option>
+              <option value="BACK">Back</option>
+              <option value="SHOULDERS">Shoulders</option>
+              <option value="BICEPS">Biceps</option>
+              <option value="TRICEPS">Triceps</option>
+              <option value="QUADS">Quads</option>
+              <option value="HAMSTRINGS">Hamstrings</option>
+              <option value="GLUTES">Glutes</option>
+              <option value="CALVES">Calves</option>
+              <option value="CORE">Core</option>
+              <option value="FULL_BODY">Full body</option>
+            </select>
+          </label>
+          <label class="field"><span>Description (optional)</span><input name="description" maxlength="200" /></label>
+          <!-- Create: POST /api/exercises; the new exercise appears in the results -->
+          <button class="btn primary" type="submit">Create</button>
+        </div>
+        <p class="form-error" role="alert"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <template id="exerciseCardTemplate">
+    <article class="stat-tile">
+      <div class="card-head">
+        <strong data-field="name"></strong>
+        <span class="pill custom" data-field="custom">Custom</span>
+      </div>
+      <span class="pill" data-field="group"></span>
+      <p class="muted" data-field="description"></p>
+      <!-- View progress: opens progress.html with this exercise's chart -->
+      <a class="btn small">View progress</a>
+    </article>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/exercises.js"></script>
+</body>
+</html>

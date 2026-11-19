@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<!--
+  workouts.html: create a workout and see the history.
+  Script: js/workouts.js (GET /api/workouts?status=..., POST /api/workouts).
+  Rules: WKT-08 (plan day, name, date), PRG-06 (history newest first).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workouts · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="dashboard.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="index.html">Plan</a>
+      <a href="workouts.html">Workouts</a>
+      <a href="exercises.html">Exercises</a>
+      <a href="progress.html">Progress</a>
+      <a href="goals.html">Goals</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" id="logoutLink">Log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="view-head">
+      <div>
+        <p class="eyebrow">sessions</p>
+        <h1>Workouts</h1>
+        <p class="muted">Create a session from a plan day, or an empty one and add exercises yourself.</p>
+      </div>
+    </div>
+
+    <section class="section stack">
+      <form class="card form" id="newWorkoutForm" novalidate>
+        <h2>New workout</h2>
+        <div class="form-row">
+          <label class="field"><span>Plan day</span>
+            <select name="planSlug">
+              <option value="push">Push Day</option>
+              <option value="pull">Pull Day</option>
+              <option value="legs">Leg Day + Core</option>
+              <option value="upper">Upper</option>
+              <option value="lower">Lower</option>
+              <option value="">Custom (empty)</option>
+            </select>
+          </label>
+          <label class="field"><span>Date</span>
+            <input name="workoutDate" type="date" id="workoutDate" required />
+          </label>
+          <label class="field"><span>Name (optional)</span>
+            <input name="name" maxlength="60" placeholder="Uses the plan day name" />
+          </label>
+          <!-- Create button: POST /api/workouts, then opens the new workout -->
+          <button class="btn primary" type="submit">Create</button>
+        </div>
+        <p class="form-error" role="alert"></p>
+      </form>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>History</h2>
+          <!-- Status filter: each link reloads this page with ?status=... -->
+          <div class="filters" id="statusFilters" role="group" aria-label="Filter by status">
+            <a class="filter-btn" href="workouts.html">All</a>
+            <a class="filter-btn" href="workouts.html?status=PLANNED">Planned</a>
+            <a class="filter-btn" href="workouts.html?status=IN_PROGRESS">In progress</a>
+            <a class="filter-btn" href="workouts.html?status=COMPLETED">Completed</a>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Date</th><th>Workout</th><th>Status</th><th>Exercises</th><th>Sets</th><th>Volume</th><th>Minutes</th></tr>
+            </thead>
+            <tbody id="workoutRows"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="emptyMessage" hidden>No workouts here yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Gym Tracker · runs locally, data stays on this computer.</p>
+  </footer>
+
+  <template id="workoutRowTemplate">
+    <tr>
+      <td data-field="date"></td>
+      <td><a><strong data-field="name"></strong></a></td>
+      <td><span class="pill" data-field="status"></span></td>
+      <td data-field="exercises"></td>
+      <td data-field="sets"></td>
+      <td data-field="volume"></td>
+      <td data-field="minutes"></td>
+    </tr>
+  </template>
+
+  <script src="js/common.js"></script>
+  <script src="js/workouts.js"></script>
+</body>
+</html>

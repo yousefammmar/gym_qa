@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!--
+  login.html: log in with username and password (POST /api/auth/login).
+  Script: js/login.js. On success the token is saved and dashboard.html opens.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in · Gym Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">PPL</span><span>Upper/Lower</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="login.html">Log in</a>
+      <a href="register.html" class="nav-cta">Sign up</a>
+    </nav>
+  </header>
+
+  <main class="auth-wrap">
+    <p class="eyebrow">welcome back</p>
+    <h1>Log in</h1>
+    <form class="card form" id="loginForm" novalidate>
+      <label class="field"><span>Username</span>
+        <input name="username" autocomplete="username" required />
+      </label>
+      <label class="field"><span>Password</span>
+        <input name="password" type="password" autocomplete="current-password" required />
+      </label>
+      <p class="form-error" role="alert"></p>
+      <!-- Log in button: POST /api/auth/login. Wrong details show "Wrong username or password (AUTH-06)" -->
+      <button class="btn primary" type="submit">Log in</button>
+      <p class="muted">No account yet? <a href="register.html"><strong>Create one</strong></a></p>
+    </form>
+  </main>
+
+  <script src="js/common.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

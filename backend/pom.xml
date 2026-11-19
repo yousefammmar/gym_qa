@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Gym Tracker build file (Maven).
+  Run every command from this backend/ folder.
+  Beginner notes:
+    mvn spring-boot:run   (or ./mvnw spring-boot:run)  -> starts the app on http://localhost:8080
+                                                           (API + the website in ../frontend)
+    mvn test                                            -> runs every JUnit 5 test and writes the
+                                                           JaCoCo report to target/site/jacoco/index.html
+    mvn test-compile org.pitest:pitest-maven:mutationCoverage
+                                                        -> PIT mutation testing, report in target/pit-reports/index.html
+  Nothing here deploys anything: the app only runs on localhost.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.16</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.gymtracker</groupId>
+    <artifactId>gym-tracker</artifactId>
+    <version>1.0.0</version>
+    <name>Gym Tracker</name>
+    <description>Local PPL + Upper/Lower gym tracker (System Under Test for a QA course)</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <jacoco.version>0.8.16</jacoco.version>
+        <pitest.version>1.30.2</pitest.version>
+        <pitest.junit5.version>1.2.3</pitest.junit5.version>
+    </properties>
+
+    <dependencies>
+        <!-- REST controllers + embedded Tomcat + serving the website from ../frontend -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- JdbcTemplate + running db/schema.sql on startup -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <!-- SQLite driver: the database is a single file in ./data (version managed by Spring Boot) -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+        </dependency>
+        <!-- BCrypt password hashing only (no Spring Security filter chain, to keep auth readable) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
+        <!-- JUnit 5 + Mockito + AssertJ + MockMvc -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- JaCoCo: line, instruction and branch coverage. Report is written during `mvn test`. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <!-- startup class only creates ./data and boots Spring -->
+                        <exclude>com/gymtracker/GymTrackerApplication.class</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- PIT mutation testing: mutates the business rules, runs the fast unit tests against them -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest.junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <targetClasses>
+                        <param>com.gymtracker.service.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.gymtracker.unit.*</param>
+                    </targetTests>
+                    <mutators>
+                        <!-- DEFAULTS: conditional boundary, negate conditionals, math, increments,
+                             return values, void method calls. Plus removed conditionals and inlined constants. -->
+                        <mutator>DEFAULTS</mutator>
+                        <mutator>REMOVE_CONDITIONALS</mutator>
+                        <mutator>INLINE_CONSTS</mutator>
+                    </mutators>
+                    <outputFormats>
+                        <format>HTML</format>
+                        <format>XML</format>
+                    </outputFormats>
+                    <timestampedReports>false</timestampedReports>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

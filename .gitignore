@@ -1,0 +1,12 @@
+# Maven build output (test reports, JaCoCo, PIT)
+backend/target/
+
+# Local SQLite database: personal workout data never goes into Git.
+# The folder itself is kept (backend/data/.gitkeep) and is also created automatically on startup.
+backend/data/*
+!backend/data/.gitkeep
+
+.DS_Store
+.idea/
+.vscode/
+*.iml
